@@ -1,0 +1,159 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "headers": {
+            "status ": "success",
+            "message": ""
+          },
+          "body": "hello @{body('Parse_JSON')?['body']?['input']?['name']} "
+        },
+        "runAfter": {
+          "Insert_row_(V2)": [
+            "SUCCEEDED"
+          ]
+        }
+      },
+      "Parse_JSON": {
+        "type": "ParseJson",
+        "inputs": {
+          "content": "@body('Call_an_Azure_function')",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "statusCode": {
+                "type": "integer"
+              },
+              "headers": {
+                "type": "object",
+                "properties": {
+                  "Date": {
+                    "type": "string"
+                  },
+                  "Server": {
+                    "type": "string"
+                  },
+                  "Transfer-Encoding": {
+                    "type": "string"
+                  },
+                  "Content-Type": {
+                    "type": "string"
+                  },
+                  "Content-Length": {
+                    "type": "string"
+                  }
+                }
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      },
+                      "feedback": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "runAfter": {
+          "Call_an_Azure_function": [
+            "SUCCEEDED"
+          ]
+        }
+      },
+      "Insert_row_(V2)": {
+        "type": "ApiConnection",
+        "inputs": {
+          "host": {
+            "connection": {
+              "referenceName": "sql"
+            }
+          },
+          "method": "post",
+          "body": {
+            "Name": "@body('Parse_JSON')?['body']?['input']?['name']",
+            "Email": "@body('Parse_JSON')?['body']?['input']?['email']",
+            "Message": "@body('Parse_JSON')?['body']?['input']?['feedback']"
+          },
+          "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/tables/@{encodeURIComponent(encodeURIComponent('[dbo].[UserMessages]'))}/items"
+        },
+        "runAfter": {
+          "Parse_JSON": [
+            "SUCCEEDED"
+          ]
+        }
+      },
+      "Call_an_Azure_function": {
+        "type": "Function",
+        "inputs": {
+          "method": "POST",
+          "body": {
+            "name": "@{triggerBody()?['name']}",
+            "email": "@{triggerBody()?['email']}",
+            "message": "@{triggerBody()?['feedback']}",
+            "rating": ""
+          },
+          "function": {
+            "connectionName": "azureFunctionOperation"
+          }
+        },
+        "runAfter": {}
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "When_a_HTTP_request_is_received": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "feedback": {
+                "type": "string"
+              },
+              "rating": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "email",
+              "feedback"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "kind": "Stateful"
+}

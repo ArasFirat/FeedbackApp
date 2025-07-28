@@ -1,0 +1,31 @@
+{
+  "managedApiConnections": {
+    "sql": {
+      "api": {
+        "id": "/subscriptions/74ea1385-abdb-4751-9be4-c189a36f3a5a/providers/Microsoft.Web/locations/westeurope/managedApis/sql"
+      },
+      "connection": {
+        "id": "/subscriptions/74ea1385-abdb-4751-9be4-c189a36f3a5a/resourceGroups/yg-stj-logicapps/providers/Microsoft.Web/connections/sql"
+      },
+      "authentication": {
+        "type": "ManagedServiceIdentity"
+      },
+      "connectionRuntimeUrl": "https://d81097ce16da00c4.13.common.logic-westeurope.azure-apihub.net/apim/sql/dccfae78562d4b9587fcc24c446a5008"
+    }
+  },
+  "serviceProviderConnections": {},
+  "functionConnections": {
+    "azureFunctionOperation": {
+      "function": {
+        "id": "/subscriptions/74ea1385-abdb-4751-9be4-c189a36f3a5a/resourceGroups/yg-stj-logicapps/providers/Microsoft.Web/sites/stajproje-enrichFunction/functions/enrich_user_data"
+      },
+      "triggerUrl": "https://stajproje-enrichfunction-g0drckf5hhdrbqcd.westeurope-01.azurewebsites.net/api/enrichuserdata",
+      "authentication": {
+        "type": "QueryString",
+        "name": "Code",
+        "value": "@appsetting('azureFunctionOperation_functionAppKey')"
+      },
+      "displayName": "new_conn_ee82e"
+    }
+  }
+}
